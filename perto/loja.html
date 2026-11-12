@@ -37,6 +37,17 @@
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 $('play').href = PERTO.PLAY_STORE_URL;
+const DIAS = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
+function horario(o){
+  const d = [...(o.days_of_week || [])].sort((a,b) => a-b);
+  let t = '';
+  if (d.length && d.length < 7) {
+    const seguidos = d.every((v,i) => i === 0 || v === d[i-1] + 1);
+    t += seguidos && d.length > 2 ? `${DIAS[d[0]-1]} a ${DIAS[d[d.length-1]-1]}` : d.map(x => DIAS[x-1]).join(', ');
+  }
+  if (o.hour_start && o.hour_end) t += (t ? ', ' : '') + `${o.hour_start.slice(0,5)}–${o.hour_end.slice(0,5)}`;
+  return t ? `<b>${t}</b> · ` : '';
+}
 
 (async () => {
   const id = new URLSearchParams(location.search).get('loja') || '';
@@ -44,7 +55,7 @@ $('play').href = PERTO.PLAY_STORE_URL;
   const sb = supabase.createClient(PERTO.SUPABASE_URL, PERTO.SUPABASE_ANON_KEY);
   const [{ data: shop }, { data: offers }] = await Promise.all([
     sb.from('perto_shops').select('name,address,phone,lat,lng').eq('id', id).maybeSingle(),
-    sb.from('perto_offers').select('title,description,ends_at').eq('shop_id', id).order('ends_at')
+    sb.from('perto_offers').select('title,description,ends_at,days_of_week,hour_start,hour_end').eq('shop_id', id).order('ends_at')
   ]);
   if (!shop) { $('name').textContent = 'Loja não encontrada'; return; }
   document.title = shop.name + ' — Ofertas';
@@ -54,7 +65,7 @@ $('play').href = PERTO.PLAY_STORE_URL;
   $('offers').innerHTML = (offers && offers.length) ? offers.map(o => `
     <div class="card"><h2>${esc(o.title)}</h2>
       ${o.description ? `<p>${esc(o.description)}</p>` : ''}
-      <p class="mut">Válido até ${new Date(o.ends_at).toLocaleDateString('pt-PT')}</p></div>`).join('')
+      <p class="mut">${horario(o)}Válido até ${new Date(o.ends_at).toLocaleDateString('pt-PT')}</p></div>`).join('')
     : '<div class="card"><p class="mut">Neste momento não há ofertas ativas. Volta em breve!</p></div>';
 })();
 </script>
