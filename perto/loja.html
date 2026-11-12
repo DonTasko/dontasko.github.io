@@ -68,7 +68,7 @@ function horario(o){
   $('offers').innerHTML = (offers && offers.length) ? offers.map(o => `
     <div class="card"><h2>${esc(o.title)}</h2>
       ${o.description ? `<p>${esc(o.description)}</p>` : ''}
-      <p class="mut">${horario(o)}Válido até ${new Date(o.ends_at).toLocaleDateString('pt-PT')}</p></div>`).join('')
+      <p class="mut">${horario(o)}${o.ends_at ? 'Válido até ' + new Date(o.ends_at).toLocaleDateString('pt-PT') : 'Sem data de fim'}</p></div>`).join('')
     : '<div class="card"><p class="mut">Neste momento não há ofertas ativas. Volta em breve!</p></div>';
 })();
 </script>

@@ -124,8 +124,8 @@
     <label>Título (aparece na notificação)</label><input id="oTitle" maxlength="80" placeholder="Ex.: Café + pastel de nata por 1,50€">
     <label>Descrição (opcional)</label><textarea id="oDesc" maxlength="500"></textarea>
     <div class="grid2">
-      <div><label>Começa</label><input id="oStart" type="datetime-local"></div>
-      <div><label>Termina</label><input id="oEnd" type="datetime-local"></div>
+      <div><label>Começa (vazio = já)</label><input id="oStart" type="datetime-local"></div>
+      <div><label>Termina (vazio = sem fim)</label><input id="oEnd" type="datetime-local"></div>
     </div>
     <label>Dias da semana</label>
     <div class="days" id="oDays"></div>
@@ -333,7 +333,7 @@ function resetOfferForm(){
 function editOffer(o){
   editingOffer = o;
   $('oTitle').value = o.title; $('oDesc').value = o.description || '';
-  $('oStart').value = toLocal(new Date(o.starts_at)); $('oEnd').value = toLocal(new Date(o.ends_at));
+  $('oStart').value = toLocal(new Date(o.starts_at)); $('oEnd').value = o.ends_at ? toLocal(new Date(o.ends_at)) : '';
   $('oH1').value = o.hour_start ? o.hour_start.slice(0, 5) : ''; $('oH2').value = o.hour_end ? o.hour_end.slice(0, 5) : '';
   $('oDays').innerHTML = DAYS.map((d, i) => `<label><input type="checkbox" value="${i + 1}" ${o.days_of_week.includes(i + 1) ? 'checked' : ''}>${d}</label>`).join('');
   $('offerFormTitle').textContent = 'Editar oferta'; $('btnSaveOffer').textContent = 'Guardar alterações';
@@ -343,12 +343,12 @@ function editOffer(o){
 $('btnCancelEdit').onclick = resetOfferForm;
 function toLocal(d){ const z = n => String(n).padStart(2, '0');
   return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`; }
-function fmt(iso){ return new Date(iso).toLocaleString('pt-PT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }); }
+function fmt(iso){ if (!iso) return 'sem fim'; return new Date(iso).toLocaleString('pt-PT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }); }
 function state(o){
   const n = Date.now();
   if (!o.active) return ['Pausada', ''];
   if (n < Date.parse(o.starts_at)) return ['Agendada', 'warn'];
-  if (n > Date.parse(o.ends_at)) return ['Terminada', ''];
+  if (o.ends_at && n > Date.parse(o.ends_at)) return ['Terminada', ''];
   const pt = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Lisbon' }));
   const dow = pt.getDay() === 0 ? 7 : pt.getDay();
   const hm = String(pt.getHours()).padStart(2, '0') + ':' + String(pt.getMinutes()).padStart(2, '0');
@@ -384,14 +384,15 @@ $('btnSaveOffer').onclick = async () => {
   $('offerMsg').textContent = '';
   const title = $('oTitle').value.trim();
   const days = [...$('oDays').querySelectorAll('input:checked')].map(i => +i.value);
-  const s = new Date($('oStart').value), en = new Date($('oEnd').value);
+  const s = $('oStart').value ? new Date($('oStart').value) : new Date();
+  const en = $('oEnd').value ? new Date($('oEnd').value) : null;
   const h1 = $('oH1').value || null, h2 = $('oH2').value || null;
   if (title.length < 3) return $('offerMsg').textContent = 'Escreve um título com pelo menos 3 letras.';
-  if (isNaN(s) || isNaN(en) || en <= s) return $('offerMsg').textContent = 'A data de fim tem de ser depois do início.';
+  if (isNaN(s) || (en && (isNaN(en) || en <= s))) return $('offerMsg').textContent = 'A data de fim tem de ser depois do início.';
   if (!days.length) return $('offerMsg').textContent = 'Escolhe pelo menos um dia.';
   if ((h1 && !h2) || (!h1 && h2) || (h1 && h2 && h2 <= h1)) return $('offerMsg').textContent = 'Horário inválido: preenche as duas horas, com o fim depois do início.';
   const row = { title, description: $('oDesc').value.trim() || null, starts_at: s.toISOString(),
-    ends_at: en.toISOString(), days_of_week: days, hour_start: h1, hour_end: h2 };
+    ends_at: en ? en.toISOString() : null, days_of_week: days, hour_start: h1, hour_end: h2 };
   const { error } = editingOffer
     ? await sb.from('perto_offers').update(row).eq('id', editingOffer.id)
     : await sb.from('perto_offers').insert({ shop_id: current.id, ...row });
