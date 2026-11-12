@@ -104,7 +104,7 @@
     <h3>Ofertas</h3>
     <div id="offers"></div>
 
-    <h3>Nova oferta</h3>
+    <h3 id="offerFormTitle">Nova oferta</h3>
     <label>Título (aparece na notificação)</label><input id="oTitle" maxlength="80" placeholder="Ex.: Café + pastel de nata por 1,50€">
     <label>Descrição (opcional)</label><textarea id="oDesc" maxlength="500"></textarea>
     <div class="grid2">
@@ -118,7 +118,7 @@
       <div><label>Até (opcional)</label><input id="oH2" type="time"></div>
     </div>
     <p id="offerMsg" class="msg"></p>
-    <button id="btnSaveOffer">Publicar oferta</button>
+    <div class="row"><button id="btnSaveOffer">Publicar oferta</button><button id="btnCancelEdit" class="ghost" hidden>Cancelar edição</button></div>
   </div>
 </section>
 </main>
@@ -133,7 +133,7 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const CB = [39.8222, -7.4909]; // Castelo Branco
 const DAYS = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
-let user = null, shops = [], editing = null, current = null, map = null, marker = null, pos = null;
+let user = null, shops = [], offersCache = [], editingOffer = null, editing = null, current = null, map = null, marker = null, pos = null;
 
 function errPt(m){
   if (/Invalid login/i.test(m)) return 'Email ou palavra-passe errados.';
@@ -248,15 +248,32 @@ function openDetail(s){
     : 'A aguardar aprovação. Podes já criar ofertas; aparecem na app quando a loja for aprovada.';
   const url = landingUrl(s.id);
   $('qr').innerHTML = qrSvg(url, 6); $('qrLink').textContent = url;
-  const now = new Date(), end = new Date(now.getTime() + 7 * 864e5);
-  $('oStart').value = toLocal(now); $('oEnd').value = toLocal(end);
-  $('oTitle').value = ''; $('oDesc').value = ''; $('oH1').value = ''; $('oH2').value = '';
-  $('oDays').innerHTML = DAYS.map((d, i) => `<label><input type="checkbox" value="${i + 1}" checked>${d}</label>`).join('');
+  resetOfferForm();
   loadOffers();
   $('shopDetail').scrollIntoView({ behavior: 'smooth' });
 }
 $('btnCloseDetail').onclick = () => { $('shopDetail').hidden = true; };
 
+function resetOfferForm(){
+  editingOffer = null;
+  const now = new Date(), end = new Date(now.getTime() + 7 * 864e5);
+  $('oStart').value = toLocal(now); $('oEnd').value = toLocal(end);
+  $('oTitle').value = ''; $('oDesc').value = ''; $('oH1').value = ''; $('oH2').value = '';
+  $('oDays').innerHTML = DAYS.map((d, i) => `<label><input type="checkbox" value="${i + 1}" checked>${d}</label>`).join('');
+  $('offerFormTitle').textContent = 'Nova oferta'; $('btnSaveOffer').textContent = 'Publicar oferta';
+  $('btnCancelEdit').hidden = true; $('offerMsg').textContent = '';
+}
+function editOffer(o){
+  editingOffer = o;
+  $('oTitle').value = o.title; $('oDesc').value = o.description || '';
+  $('oStart').value = toLocal(new Date(o.starts_at)); $('oEnd').value = toLocal(new Date(o.ends_at));
+  $('oH1').value = o.hour_start ? o.hour_start.slice(0, 5) : ''; $('oH2').value = o.hour_end ? o.hour_end.slice(0, 5) : '';
+  $('oDays').innerHTML = DAYS.map((d, i) => `<label><input type="checkbox" value="${i + 1}" ${o.days_of_week.includes(i + 1) ? 'checked' : ''}>${d}</label>`).join('');
+  $('offerFormTitle').textContent = 'Editar oferta'; $('btnSaveOffer').textContent = 'Guardar alterações';
+  $('btnCancelEdit').hidden = false; $('offerMsg').textContent = '';
+  $('offerFormTitle').scrollIntoView({ behavior: 'smooth' });
+}
+$('btnCancelEdit').onclick = resetOfferForm;
 function toLocal(d){ const z = n => String(n).padStart(2, '0');
   return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`; }
 function fmt(iso){ return new Date(iso).toLocaleString('pt-PT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }); }
@@ -265,24 +282,33 @@ function state(o){
   if (!o.active) return ['Pausada', ''];
   if (n < Date.parse(o.starts_at)) return ['Agendada', 'warn'];
   if (n > Date.parse(o.ends_at)) return ['Terminada', ''];
-  return ['Em curso', 'ok'];
+  const pt = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Lisbon' }));
+  const dow = pt.getDay() === 0 ? 7 : pt.getDay();
+  const hm = String(pt.getHours()).padStart(2, '0') + ':' + String(pt.getMinutes()).padStart(2, '0');
+  const foraHoras = !o.days_of_week.includes(dow) ||
+    (o.hour_start && o.hour_end && (hm < o.hour_start.slice(0, 5) || hm > o.hour_end.slice(0, 5)));
+  return foraHoras ? ['Ativa · fora de horas', 'warn'] : ['Em curso', 'ok'];
 }
 
 async function loadOffers(){
   const { data, error } = await sb.from('perto_offers').select('*').eq('shop_id', current.id).order('created_at', { ascending: false });
   if (error) { $('offers').innerHTML = `<p class="msg">${esc(errPt(error.message))}</p>`; return; }
+  offersCache = data;
   $('offers').innerHTML = data.length ? data.map(o => { const [t, c] = state(o); return `
     <div class="item">
       <div><b>${esc(o.title)}</b><br>
         <span class="mut">${fmt(o.starts_at)} → ${fmt(o.ends_at)}${o.hour_start && o.hour_end ? ` · ${o.hour_start.slice(0,5)}–${o.hour_end.slice(0,5)}` : ''}${o.days_of_week.length < 7 ? ' · ' + o.days_of_week.map(d => DAYS[d - 1]).join(', ') : ''}</span></div>
       <div class="row">
         <span class="badge ${c}">${t}</span>
+        <button class="small ghost" data-editoffer="${o.id}">Editar</button>
         <button class="small ghost" data-toggle="${o.id}" data-active="${o.active}">${o.active ? 'Pausar' : 'Ativar'}</button>
         <button class="small danger" data-del="${o.id}">Apagar</button>
       </div>
     </div>`; }).join('') : '<p class="mut">Sem ofertas.</p>';
 }
 $('offers').onclick = async e => {
+  const ed = e.target.dataset.editoffer;
+  if (ed) { editOffer(offersCache.find(o => o.id === ed)); return; }
   const t = e.target.dataset.toggle, d = e.target.dataset.del;
   if (t) { await sb.from('perto_offers').update({ active: e.target.dataset.active !== 'true' }).eq('id', t); loadOffers(); }
   if (d && confirm('Apagar esta oferta?')) { await sb.from('perto_offers').delete().eq('id', d); loadOffers(); }
@@ -297,11 +323,13 @@ $('btnSaveOffer').onclick = async () => {
   if (isNaN(s) || isNaN(en) || en <= s) return $('offerMsg').textContent = 'A data de fim tem de ser depois do início.';
   if (!days.length) return $('offerMsg').textContent = 'Escolhe pelo menos um dia.';
   if ((h1 && !h2) || (!h1 && h2) || (h1 && h2 && h2 <= h1)) return $('offerMsg').textContent = 'Horário inválido: preenche as duas horas, com o fim depois do início.';
-  const { error } = await sb.from('perto_offers').insert({ shop_id: current.id, title,
-    description: $('oDesc').value.trim() || null, starts_at: s.toISOString(), ends_at: en.toISOString(),
-    days_of_week: days, hour_start: h1, hour_end: h2 });
+  const row = { title, description: $('oDesc').value.trim() || null, starts_at: s.toISOString(),
+    ends_at: en.toISOString(), days_of_week: days, hour_start: h1, hour_end: h2 };
+  const { error } = editingOffer
+    ? await sb.from('perto_offers').update(row).eq('id', editingOffer.id)
+    : await sb.from('perto_offers').insert({ shop_id: current.id, ...row });
   if (error) return $('offerMsg').textContent = errPt(error.message);
-  $('oTitle').value = ''; $('oDesc').value = ''; loadOffers();
+  resetOfferForm(); loadOffers();
 };
 
 $('btnPrint').onclick = () => {
