@@ -8,7 +8,9 @@
   :root{--p:#E4572E}
   body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#f6f4f1;color:#222}
   header{background:var(--p);color:#fff;padding:22px 18px}
+  header{display:flex;gap:14px;align-items:center}
   header h1{margin:0;font-size:24px} header p{margin:4px 0 0;opacity:.9}
+  #logo{width:64px;height:64px;border-radius:14px;object-fit:cover;background:#fff;flex:none}
   main{max-width:560px;margin:0 auto;padding:16px}
   .card{background:#fff;border-radius:12px;padding:16px;margin-bottom:12px;box-shadow:0 1px 3px #0001}
   .card h2{margin:0 0 6px;font-size:18px} .mut{color:#777;font-size:14px}
@@ -18,7 +20,7 @@
 </style>
 </head>
 <body>
-<header><h1 id="name">A carregar…</h1><p id="addr"></p></header>
+<header><img id="logo" alt="" hidden><div><h1 id="name">A carregar…</h1><p id="addr"></p></div></header>
 <main>
   <div id="offers"></div>
   <div class="card promo">
@@ -54,11 +56,12 @@ function horario(o){
   if (!/^[0-9a-f-]{36}$/i.test(id)) { $('name').textContent = 'Loja não encontrada'; return; }
   const sb = supabase.createClient(PERTO.SUPABASE_URL, PERTO.SUPABASE_ANON_KEY);
   const [{ data: shop }, { data: offers }] = await Promise.all([
-    sb.from('perto_shops').select('name,address,phone,lat,lng').eq('id', id).maybeSingle(),
+    sb.from('perto_shops').select('name,address,phone,lat,lng,logo_url').eq('id', id).maybeSingle(),
     sb.from('perto_offers').select('title,description,ends_at,days_of_week,hour_start,hour_end').eq('shop_id', id).order('ends_at')
   ]);
   if (!shop) { $('name').textContent = 'Loja não encontrada'; return; }
   document.title = shop.name + ' — Ofertas';
+  if (shop.logo_url) { $('logo').src = shop.logo_url; $('logo').hidden = false; }
   $('name').textContent = shop.name; $('addr').textContent = shop.address || '';
   $('maps').href = `https://www.google.com/maps/search/?api=1&query=${shop.lat},${shop.lng}`; $('maps').hidden = false;
   if (shop.phone) { $('call').href = 'tel:' + shop.phone.replace(/\s/g, ''); $('call').hidden = false; }

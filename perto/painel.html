@@ -37,6 +37,8 @@
   #qr svg{width:180px;height:180px}
   .qrbox{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
   .link{word-break:break-all;font-size:12px;color:var(--mut)}
+  .logo{width:72px;height:72px;border-radius:14px;object-fit:cover;background:#eee;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#fff;flex:none}
+  .shoplogo{width:40px;height:40px;border-radius:10px;object-fit:cover;flex:none}
 </style>
 </head>
 <body>
@@ -90,6 +92,20 @@
   <div class="card" id="shopDetail" hidden>
     <div class="row between"><h2 id="dName"></h2><button id="btnCloseDetail" class="ghost small">Fechar</button></div>
     <p id="dStatus" class="mut"></p>
+
+    <h3>Logotipo</h3>
+    <div class="row">
+      <div id="logoPrev"></div>
+      <div>
+        <p class="mut">Aparece na app e na página do QR. Usa uma imagem quadrada; é reduzida automaticamente.</p>
+        <div class="row">
+          <label class="ghost small" style="margin:0"><input id="logoFile" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+            <span style="display:inline-block;padding:6px 10px;border:1px solid var(--p);border-radius:8px;color:var(--p);cursor:pointer">Escolher imagem</span></label>
+          <button id="btnLogoDel" class="small ghost" hidden>Remover</button>
+        </div>
+        <p id="logoMsg" class="msg"></p>
+      </div>
+    </div>
 
     <h3>Código QR para a montra</h3>
     <div class="qrbox">
@@ -178,7 +194,7 @@ async function loadShops(){
   shops = data;
   $('shops').innerHTML = shops.length ? shops.map(s => `
     <div class="item">
-      <div><b>${esc(s.name)}</b><br><span class="mut">${esc(s.address || '')}</span></div>
+      <div class="row">${s.logo_url ? `<img class="shoplogo" src="${esc(s.logo_url)}" alt="">` : ''}<div><b>${esc(s.name)}</b><br><span class="mut">${esc(s.address || '')}</span></div></div>
       <div class="row">
         ${s.approved ? '<span class="badge ok">Aprovada</span>' : '<span class="badge warn">A aguardar aprovação</span>'}
         <button class="small" data-open="${s.id}">Ofertas e QR</button>
@@ -248,10 +264,61 @@ function openDetail(s){
     : 'A aguardar aprovação. Podes já criar ofertas; aparecem na app quando a loja for aprovada.';
   const url = landingUrl(s.id);
   $('qr').innerHTML = qrSvg(url, 6); $('qrLink').textContent = url;
+  showLogo();
   resetOfferForm();
   loadOffers();
   $('shopDetail').scrollIntoView({ behavior: 'smooth' });
 }
+function showLogo(){
+  const s = current;
+  $('logoPrev').innerHTML = s.logo_url
+    ? `<img class="logo" src="${esc(s.logo_url)}" alt="Logotipo">`
+    : `<div class="logo" style="background:var(--p)">${esc((s.name || '?').trim().charAt(0).toUpperCase())}</div>`;
+  $('btnLogoDel').hidden = !s.logo_url; $('logoMsg').textContent = '';
+}
+// Reduz para 256x256 (corte central) antes de enviar
+function resizeImage(file){
+  return new Promise((resolve, reject) => {
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => {
+      const S = 256, c = document.createElement('canvas'); c.width = c.height = S;
+      const side = Math.min(img.width, img.height);
+      const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, S, S);
+      ctx.drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, S, S);
+      URL.revokeObjectURL(url);
+      c.toBlob(b => {
+        if (b && b.type === 'image/webp') return resolve(b);
+        c.toBlob(b2 => b2 ? resolve(b2) : reject(new Error('Imagem inválida')), 'image/png');
+      }, 'image/webp', 0.85);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Não consegui ler a imagem')); };
+    img.src = url;
+  });
+}
+$('logoFile').onchange = async e => {
+  const f = e.target.files[0]; e.target.value = '';
+  if (!f) return;
+  $('logoMsg').style.color = ''; $('logoMsg').textContent = 'A enviar…';
+  try {
+    const blob = await resizeImage(f);
+    const ext = blob.type === 'image/webp' ? 'webp' : 'png';
+    const path = `${current.id}/logo.${ext}`;
+    await sb.storage.from('perto-logos').remove([`${current.id}/logo.webp`, `${current.id}/logo.png`]);
+    const up = await sb.storage.from('perto-logos').upload(path, blob, { contentType: blob.type, upsert: true });
+    if (up.error) throw up.error;
+    const pub = sb.storage.from('perto-logos').getPublicUrl(path).data.publicUrl + '?v=' + Date.now();
+    const { error } = await sb.from('perto_shops').update({ logo_url: pub }).eq('id', current.id);
+    if (error) throw error;
+    current.logo_url = pub; showLogo(); loadShops();
+  } catch (err) { $('logoMsg').textContent = errPt(err.message || String(err)); }
+};
+$('btnLogoDel').onclick = async () => {
+  if (!confirm('Remover o logotipo?')) return;
+  await sb.storage.from('perto-logos').remove([`${current.id}/logo.webp`, `${current.id}/logo.png`]);
+  const { error } = await sb.from('perto_shops').update({ logo_url: null }).eq('id', current.id);
+  if (error) return $('logoMsg').textContent = errPt(error.message);
+  current.logo_url = null; showLogo(); loadShops();
+};
 $('btnCloseDetail').onclick = () => { $('shopDetail').hidden = true; };
 
 function resetOfferForm(){
