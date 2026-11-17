@@ -1,112 +1,844 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#0f766e" />
-  <meta name="description" content="L.Apps Studio — aplicações e ferramentas web feitas em Portugal: calculadoras financeiras, gestão de negócio e utilitários do dia a dia." />
-  <title>L.Apps Studio</title>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3274946720409347"
-     crossorigin="anonymous"></script>
-  <style>
-    :root { color-scheme: light dark; }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: #f8fafc;
-      color: #0f172a;
-      line-height: 1.5;
-    }
-    header {
-      background: #0f766e;
-      color: #fff;
-      padding: 48px 20px 40px;
-      text-align: center;
-    }
-    header h1 { margin: 0 0 8px; font-size: 2rem; }
-    header p { margin: 0; opacity: 0.9; max-width: 520px; margin: 0 auto; }
-    main {
-      max-width: 720px;
-      margin: -24px auto 0;
-      padding: 0 20px 60px;
-    }
-    .card {
-      background: #fff;
-      border-radius: 14px;
-      padding: 24px;
-      margin-top: 20px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-      display: block;
-      text-decoration: none;
-      color: inherit;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
-    }
-    .card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.1); }
-    .card h2 { margin: 0 0 6px; font-size: 1.15rem; color: #0f766e; }
-    .card p { margin: 0; color: #475569; font-size: 0.95rem; }
-    .badge {
-      display: inline-block;
-      font-size: 0.75rem;
-      background: #ccfbf1;
-      color: #0f766e;
-      padding: 2px 8px;
-      border-radius: 999px;
-      margin-bottom: 8px;
-    }
-    section.about {
-      margin-top: 40px;
-      color: #334155;
-      font-size: 0.95rem;
-    }
-    section.about h2 { font-size: 1.1rem; color: #0f172a; }
-    footer {
-      text-align: center;
-      padding: 24px 20px;
-      color: #94a3b8;
-      font-size: 0.85rem;
-    }
-    @media (prefers-color-scheme: dark) {
-      body { background: #0b1120; color: #e2e8f0; }
-      .card { background: #111827; box-shadow: none; border: 1px solid #1f2937; }
-      .card p { color: #94a3b8; }
-      section.about { color: #cbd5e1; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Don Tasko — Restaurante em Castelo Branco</title>
+    <meta name="description" content="Don Tasko — Cortes de Novilho em Castelo Branco. Reserve a sua mesa online.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap">
+    <style>
+/* ── TOKENS ── */
+:root {
+    --bg:       #0d0b09;
+    --surface:  #131110;
+    --surface2: #1a1714;
+    --fg:       #f0ece4;
+    --dim:      #8a8278;
+    --red:      #c0392b;
+    --gold:     #c9a84c;
+    --border:   rgba(240,236,228,.08);
+    --display:  'Bebas Neue', sans-serif;
+    --serif:    'Instrument Serif', serif;
+    --body:     'Inter', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: var(--body);
+    background: var(--bg);
+    color: var(--fg);
+    overflow-x: hidden;
+    padding-left: max(0px, env(safe-area-inset-left,0px));
+    padding-right: max(0px, env(safe-area-inset-right,0px));
+    padding-top: env(safe-area-inset-top,0px);
+    padding-bottom: env(safe-area-inset-bottom,0px);
+}
+
+/* ── HEADER ── */
+header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.2rem max(5%, 24px);
+    padding-left: max(max(5%, 24px), env(safe-area-inset-left,0px));
+    padding-right: max(max(5%, 24px), env(safe-area-inset-right,0px));
+    background: rgba(13,11,9,.96);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(8px);
+}
+.logo-text {
+    font-family: var(--display);
+    font-size: 1.9rem;
+    color: var(--fg);
+    letter-spacing: .08em;
+    text-decoration: none;
+}
+.logo-text .dot { color: var(--red); }
+nav { display: flex; gap: 2rem; align-items: center; }
+nav a {
+    font-size: .74rem;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: var(--dim);
+    text-decoration: none;
+    transition: color .2s;
+}
+nav a:hover { color: var(--gold); }
+.nav-cta {
+    background: var(--red) !important;
+    color: #fff !important;
+    padding: .5rem 1.3rem !important;
+    transition: background .2s !important;
+}
+.nav-cta:hover { background: #a93226 !important; color: #fff !important; }
+
+/* ── HERO ── */
+.hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 100svh;
+    padding-top: 65px;
+}
+.hero-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 5rem max(5%, 32px);
+    padding-left: max(max(5%, 32px), env(safe-area-inset-left,0px));
+    gap: 2rem;
+}
+.hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: .7rem;
+    font-size: .7rem;
+    letter-spacing: .25em;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: var(--gold);
+}
+.hero-tag::before { content: ''; width: 28px; height: 1px; background: var(--gold); }
+.hero-title {
+    font-family: var(--display);
+    font-size: clamp(4rem, 7vw, 8rem);
+    line-height: .92;
+    letter-spacing: .04em;
+    color: var(--fg);
+}
+.hero-title .accent { color: var(--red); display: block; }
+.hero-horarios {
+    font-size: .78rem;
+    color: var(--dim);
+    letter-spacing: .08em;
+    line-height: 1.8;
+}
+.hero-horarios span { color: var(--gold); margin: 0 6px; }
+.hero-sub {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(.95rem, 1.6vw, 1.2rem);
+    color: var(--dim);
+    line-height: 1.7;
+    max-width: 40ch;
+}
+.hero-actions { display: flex; flex-wrap: wrap; gap: .8rem; }
+
+.btn-red {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .9rem 2rem;
+    background: var(--red);
+    color: #fff;
+    font-size: .78rem;
+    font-weight: 500;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background .2s, transform .15s;
+}
+.btn-red:hover { background: #a93226; transform: translateY(-2px); }
+.btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .9rem 2rem;
+    border: 1px solid var(--border);
+    color: var(--dim);
+    font-size: .78rem;
+    font-weight: 500;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: border-color .2s, color .2s;
+}
+.btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+.btn-gold {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .7rem 1.4rem;
+    border: 1px solid rgba(201,168,76,.4);
+    background: rgba(201,168,76,.08);
+    color: var(--gold);
+    font-size: .74rem;
+    font-weight: 500;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: border-color .2s, background .2s;
+}
+.btn-gold:hover { border-color: var(--gold); background: rgba(201,168,76,.14); }
+
+.hero-stats {
+    display: flex;
+    gap: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+}
+.stat { display: flex; flex-direction: column; gap: .2rem; }
+.stat .n {
+    font-family: var(--display);
+    font-size: 2.4rem;
+    color: var(--fg);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: .04em;
+}
+.stat .l { font-size: .65rem; letter-spacing: .22em; text-transform: uppercase; color: var(--dim); }
+
+.hero-right { position: relative; overflow: hidden; background: #0a0908; }
+.hero-right img { width: 100%; height: 100%; object-fit: cover; opacity: .78; }
+.hero-right::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(135deg, rgba(13,11,9,.35) 0%, transparent 55%),
+        linear-gradient(to top, rgba(13,11,9,.75) 0%, transparent 40%);
+}
+.hero-badge {
+    position: absolute;
+    bottom: 2rem; left: 2rem;
+    z-index: 2;
+    background: rgba(13,11,9,.88);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(6px);
+    padding: 1rem 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: .3rem;
+}
+.hero-badge .bl { font-size: .65rem; letter-spacing: .22em; text-transform: uppercase; color: var(--gold); font-weight: 500; }
+.hero-badge .bv { font-family: var(--serif); font-style: italic; font-size: 1rem; color: var(--fg); }
+
+/* ── MARQUEE ── */
+.marquee-wrap {
+    overflow: hidden;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: var(--red);
+    padding: .75rem 0;
+}
+.marquee {
+    display: flex;
+    gap: 3rem;
+    white-space: nowrap;
+    animation: scroll 26s linear infinite;
+}
+.marquee span { font-size: .72rem; letter-spacing: .24em; text-transform: uppercase; color: rgba(255,255,255,.8); font-weight: 500; }
+.marquee .sep { color: rgba(255,255,255,.35); }
+@keyframes scroll { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+/* ── CORTES ── */
+.cortes { padding: 7rem max(5%,24px); }
+.section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 3.5rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+.section-head h2 {
+    font-family: var(--display);
+    font-size: clamp(2.8rem, 6vw, 5.5rem);
+    color: var(--fg);
+    letter-spacing: .04em;
+    line-height: 1;
+}
+.section-head a {
+    font-size: .72rem;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-decoration: none;
+    white-space: nowrap;
+}
+.section-head a:hover { color: var(--red); }
+
+.corte-grid {
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    gap: 1.5px;
+    background: var(--border);
+}
+.corte { background: var(--surface); display: flex; flex-direction: column; overflow: hidden; }
+.corte-img { aspect-ratio: 3/4; overflow: hidden; background: #0a0908; }
+.corte-img img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform .6s ease;
+    filter: grayscale(20%);
+}
+.corte:hover .corte-img img { transform: scale(1.07); filter: grayscale(0%); }
+.corte-body { padding: 1.4rem; display: flex; flex-direction: column; gap: .5rem; flex: 1; }
+.corte-tag { font-size: .65rem; letter-spacing: .22em; text-transform: uppercase; color: var(--gold); font-weight: 500; }
+.corte-name { font-family: var(--display); font-size: 1.5rem; letter-spacing: .05em; color: var(--fg); }
+.corte-desc { font-size: .8rem; line-height: 1.7; color: var(--dim); font-weight: 300; flex: 1; }
+
+/* ── EXTRAS ── */
+.extras { padding: 0 max(5%,24px) 6rem; }
+.extras-title {
+    font-family: var(--display);
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    color: var(--fg);
+    letter-spacing: .04em;
+    margin-bottom: 2rem;
+}
+.extras-grid {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 1.5px;
+    background: var(--border);
+}
+.extra {
+    background: var(--surface2);
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+}
+.extra-name { font-size: .88rem; font-weight: 400; color: var(--fg); min-width: 0; }
+
+/* ── ABOUT ── */
+.about {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5px;
+    background: var(--border);
+}
+.about-img { position: relative; min-height: 480px; overflow: hidden; background: #0a0908; }
+.about-img img { width: 100%; height: 100%; object-fit: cover; opacity: .8; }
+.about-text {
+    background: var(--surface2);
+    padding: 5rem max(5%,32px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1.8rem;
+}
+.about-tag { font-size: .7rem; letter-spacing: .24em; text-transform: uppercase; color: var(--red); font-weight: 500; }
+.about-text h2 { font-family: var(--display); font-size: clamp(2.5rem, 4.5vw, 4rem); color: var(--fg); letter-spacing: .04em; line-height: 1; }
+.about-text blockquote { border-left: 2px solid var(--gold); padding-left: 1.2rem; font-family: var(--serif); font-style: italic; font-size: 1.1rem; color: var(--fg); line-height: 1.6; }
+.about-text p { font-size: .9rem; line-height: 1.9; color: var(--dim); font-weight: 300; max-width: 44ch; }
+.about-divider { width: 40px; height: 2px; background: linear-gradient(to right, var(--red), var(--gold)); }
+
+/* ── INFO BLOCKS ── */
+.infos {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 1.5px;
+    background: var(--border);
+}
+.info-block {
+    background: var(--surface);
+    padding: 3rem max(4%,20px);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.info-icon { font-size: 1.6rem; }
+.info-block h3 { font-family: var(--display); font-size: 1.8rem; letter-spacing: .05em; color: var(--fg); }
+.info-block p { font-size: .86rem; line-height: 1.8; color: var(--dim); }
+.info-block a {
+    font-size: .72rem;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-decoration: none;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    margin-top: auto;
+    padding-top: .5rem;
+}
+.info-block a:hover { color: var(--red); }
+
+/* ── FOOTER ── */
+footer {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 3rem max(5%,24px) 2rem;
+    padding-left: max(max(5%,24px), env(safe-area-inset-left,0px));
+    padding-right: max(max(5%,24px), env(safe-area-inset-right,0px));
+}
+.footer-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2rem;
+}
+.foot-logo { font-family: var(--display); font-size: 1.6rem; letter-spacing: .08em; color: var(--dim); }
+.foot-logo .dot { color: var(--red); }
+.footer-empresa { font-size: .8rem; line-height: 2; color: var(--dim); }
+.footer-empresa strong { color: var(--fg); display: block; font-size: .84rem; }
+.footer-empresa a { color: var(--dim); text-decoration: none; }
+.footer-empresa a:hover { color: var(--gold); }
+
+.footer-nav { display: flex; flex-wrap: wrap; gap: 1.2rem; align-items: center; }
+.footer-nav a { font-size: .68rem; letter-spacing: .14em; text-transform: uppercase; color: var(--dim); text-decoration: none; }
+.footer-nav a:hover { color: var(--gold); }
+
+.footer-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+.footer-copy { font-size: .7rem; color: rgba(240,236,228,.3); }
+
+/* Livro de Reclamações */
+.livro-rec {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    border: 1px solid rgba(201,168,76,.25);
+    padding: 8px 14px;
+    transition: border-color .2s;
+}
+.livro-rec:hover { border-color: var(--gold); }
+.livro-rec-text { font-size: .68rem; color: var(--dim); line-height: 1.5; }
+.livro-rec-text strong { color: var(--fg); display: block; font-size: .72rem; }
+
+/* ── COOKIE BANNER ── */
+.cookie-banner {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(13,11,9,.97);
+    border-top: 1px solid rgba(201,168,76,.2);
+    padding: 16px max(5%,24px);
+    padding-left: max(max(5%,24px), env(safe-area-inset-left,0px));
+    padding-right: max(max(5%,24px), env(safe-area-inset-right,0px));
+    padding-bottom: max(16px, env(safe-area-inset-bottom,0px));
+    z-index: 8888;
+    display: none;
+}
+.cookie-banner.show { display: block; }
+.cookie-inner { max-width: 900px; margin: 0 auto; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.cookie-text { flex: 1; font-size: .78rem; color: var(--dim); line-height: 1.6; min-width: 200px; }
+.cookie-text a { color: var(--gold); text-decoration: underline; }
+.cookie-btns { display: flex; gap: 10px; flex-shrink: 0; }
+.cookie-btn {
+    padding: 8px 20px;
+    border: none;
+    font-size: .78rem;
+    font-weight: 600;
+    font-family: var(--body);
+    cursor: pointer;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all .2s;
+}
+.cookie-btn.aceitar { background: var(--red); color: #fff; }
+.cookie-btn.aceitar:hover { background: #a93226; }
+.cookie-btn.recusar { background: transparent; color: var(--dim); border: 1px solid var(--border); }
+.cookie-btn.recusar:hover { border-color: rgba(240,236,228,.3); color: var(--fg); }
+
+/* ── MODAIS ── */
+.modal-priv {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.85);
+    z-index: 9000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+}
+.modal-priv.show { display: flex; }
+.modal-priv-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 32px 28px;
+    max-width: 560px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    color: var(--fg);
+}
+.modal-priv-box h3 {
+    font-family: var(--display);
+    font-size: 1.8rem;
+    letter-spacing: .05em;
+    color: var(--gold);
+    margin-bottom: 20px;
+}
+.modal-priv-box h4 {
+    font-size: .82rem;
+    color: var(--gold);
+    margin: 16px 0 6px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.modal-priv-box p, .modal-priv-box li { font-size: .82rem; color: var(--dim); line-height: 1.8; margin-bottom: 8px; }
+.modal-priv-box ul { padding-left: 18px; margin-bottom: 8px; }
+.modal-priv-close {
+    width: 100%;
+    margin-top: 24px;
+    padding: 12px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--dim);
+    cursor: pointer;
+    font-family: var(--body);
+    font-size: .8rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all .2s;
+}
+.modal-priv-close:hover { border-color: var(--gold); color: var(--gold); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1024px) {
+    .corte-grid { grid-template-columns: repeat(2,1fr); }
+    .extras-grid { grid-template-columns: repeat(2,1fr); }
+}
+@media (max-width: 768px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-right { min-height: 320px; order: -1; }
+    .about { grid-template-columns: 1fr; }
+    .infos { grid-template-columns: 1fr; }
+    nav .nav-cta { display: none; }
+}
+@media (max-width: 480px) {
+    nav { gap: 1rem; }
+    .hero-stats { gap: 1.5rem; }
+    .corte-grid { grid-template-columns: 1fr; }
+    .extras-grid { grid-template-columns: 1fr; }
+    .cookie-inner { flex-direction: column; }
+}
+    </style>
 </head>
 <body>
-  <header>
-    <h1>L.Apps Studio</h1>
-    <p>Aplicações e ferramentas web feitas em Portugal, pensadas para o uso diário.</p>
-  </header>
 
-  <main>
-    <a class="card" href="/CalculadoraFinanceiraPT/">
-      <span class="badge">Ferramenta</span>
-      <h2>Calculadora Financeira PT</h2>
-      <p>Salário líquido, IVA, crédito habitação, juros compostos, taxa de esforço e mais de uma dezena de calculadoras pensadas para o mercado português.</p>
-    </a>
+<!-- HEADER -->
+<header>
+    <span class="logo-text">Don Tasko<span class="dot">.</span></span>
+    <nav>
+        <a href="menu.html">Menu</a>
+        <a href="bebidas.html">Vinhos</a>
+        <a href="reservas.html" class="nav-cta">Reservar</a>
+    </nav>
+</header>
 
-    <a class="card" href="/Receitas/">
-      <span class="badge">Aplicação</span>
-      <h2>Receitas Deliciosas</h2>
-      <p>Catálogo de receitas por categoria — pequeno-almoço, almoço, jantar, sobremesa e mais — com tempos de preparo, porções e notificações diárias.</p>
-    </a>
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-left">
+        <div class="hero-tag">Novilho · Castelo Branco</div>
+        <h1 class="hero-title">
+            Cortes de<span class="accent">Novilho</span>
+        </h1>
+        <p class="hero-horarios">
+            🌞 Almoço 12h–15h
+            <span>·</span>
+            🌙 Jantar 20h–23h30
+            <span>·</span>
+            Encerrado 2ª, 3ª e 4ª feira
+        </p>
+        <p class="hero-sub">Cada corte tem a sua identidade. No Don Tasko trabalhamos novilho selecionado com técnicas distintas — para que cada peça chegue à mesa no seu melhor.</p>
+        <div class="hero-actions">
+            <a href="menu.html" class="btn-red">📋 Ver Menu</a>
+            <a href="reservas.html" class="btn-ghost">🗓 Reservar Mesa</a>
+            <a href="bebidas.html" class="btn-ghost">🍷 Vinhos</a>
+        </div>
+        <div style="display:flex;gap:.8rem;flex-wrap:wrap">
+            <a href="https://www.google.com/maps/dir/?api=1&destination=Restaurante+Don+Tasko+Castelo+Branco&destination_place_id=0xd3d5f83bf5aba8b:0x2b3c6b258c2d02c8"
+               target="_blank" rel="noopener" class="btn-gold">📍 Como Chegar</a>
+            <a href="https://www.google.com/maps/place/Restaurante+Don+Tasko/@39.828886,-7.4826148,17z"
+               target="_blank" rel="noopener" class="btn-gold">⭐ Avaliar no Google</a>
+        </div>
+        <div class="hero-stats">
+            <div class="stat"><span class="n">4.8★</span><span class="l">Google Reviews</span></div>
+            <div class="stat"><span class="n">CB</span><span class="l">Castelo Branco</span></div>
+        </div>
+    </div>
+    <div class="hero-right">
+        <img src="img1.png" alt="Don Tasko — Cortes de Novilho, Castelo Branco">
+        <div class="hero-badge">
+            <span class="bl">Especialidade</span>
+            <span class="bv">Novilho, vários cortes</span>
+        </div>
+    </div>
+</section>
 
-    <a class="card" href="/CandleDelices/">
-      <span class="badge">Loja</span>
-      <h2>My Sweet Candle</h2>
-      <p>Velas decorativas artesanais, aromas próprios compostos em casa, cera vegetal e produção em pequenos lotes. Encomendas por WhatsApp.</p>
-    </a>
+<!-- MARQUEE -->
+<div class="marquee-wrap" aria-hidden="true">
+    <div class="marquee">
+        <span>Novilho Selecionado</span><span class="sep">·</span>
+        <span>Picanha Grelhada</span><span class="sep">·</span>
+        <span>Filet Mignon</span><span class="sep">·</span>
+        <span>Entrecôte</span><span class="sep">·</span>
+        <span>Carta de Vinhos</span><span class="sep">·</span>
+        <span>Reservas Online</span><span class="sep">·</span>
+        <span>Castelo Branco</span><span class="sep">·</span>
+        <span>Vários Cortes</span><span class="sep">·</span>
+        <span>Novilho Selecionado</span><span class="sep">·</span>
+        <span>Picanha Grelhada</span><span class="sep">·</span>
+        <span>Filet Mignon</span><span class="sep">·</span>
+        <span>Entrecôte</span><span class="sep">·</span>
+        <span>Carta de Vinhos</span><span class="sep">·</span>
+        <span>Reservas Online</span><span class="sep">·</span>
+        <span>Castelo Branco</span><span class="sep">·</span>
+        <span>Vários Cortes</span><span class="sep">·</span>
+    </div>
+</div>
 
-    <section class="about">
-      <h2>Sobre</h2>
-      <p>L.Apps Studio desenvolve aplicações móveis e web focadas em utilidade prática — finanças pessoais, gestão de negócio e produtividade. As ferramentas aqui disponíveis funcionam diretamente no navegador, sem necessidade de instalação.</p>
-    </section>
-  </main>
+<!-- OS NOSSOS CORTES -->
+<section class="cortes">
+    <div class="section-head">
+        <h2>Os Nossos Cortes</h2>
+        <a href="menu.html">Menu completo →</a>
+    </div>
+    <div class="corte-grid">
+        <div class="corte">
+            <div class="corte-img"><img src="img1.png" alt="Picanha Grelhada com Salada Laranja"></div>
+            <div class="corte-body">
+                <span class="corte-tag">Clássico da Casa</span>
+                <div class="corte-name">Picanha Grelhada</div>
+                <p class="corte-desc">Servida com salada laranja. Um corte marcante, com sabor concentrado e textura inconfundível.</p>
+            </div>
+        </div>
+        <div class="corte">
+            <div class="corte-img"><img src="img2.png" alt="Filet Mignon com Redução de Vinho do Porto"></div>
+            <div class="corte-body">
+                <span class="corte-tag">Corte Nobre</span>
+                <div class="corte-name">Filet Mignon</div>
+                <p class="corte-desc">Com redução de Vinho do Porto. O corte mais macio do novilho, num prato de elegância rara.</p>
+            </div>
+        </div>
+        <div class="corte">
+            <div class="corte-img"><img src="img3.png" alt="Entrecôte Grelhado"></div>
+            <div class="corte-body">
+                <span class="corte-tag">Corte Nobre</span>
+                <div class="corte-name">Entrecôte Grelhado</div>
+                <p class="corte-desc">Marmoreado natural, sabor intenso. Um dos cortes mais apreciados pelos habituais do Don Tasko.</p>
+            </div>
+        </div>
+        <div class="corte">
+            <div class="corte-img"><img src="img4.png" alt="Bife Novilho com Roquefort e Pera Flamejada"></div>
+            <div class="corte-body">
+                <span class="corte-tag">Combinação do Chef</span>
+                <div class="corte-name">Bife com Roquefort</div>
+                <p class="corte-desc">Novilho com queijo Roquefort e pera flamejada. Contraste de sabores que surpreende a cada garfada.</p>
+            </div>
+        </div>
+    </div>
+</section>
 
-  <footer>
-    &copy; 2026 L.Apps Studio
-  </footer>
+<!-- OUTROS PRATOS -->
+<section class="extras">
+    <div class="extras-title">Mais da Carta</div>
+    <div class="extras-grid">
+        <div class="extra"><span class="extra-name">Bife Novilho com Queijo de Serra, Presunto e Ovo</span></div>
+        <div class="extra"><span class="extra-name">Bife Novilho à Portuguesa</span></div>
+        <div class="extra"><span class="extra-name">Bife Novilho com Molho de Pimenta e Cogumelos</span></div>
+        <div class="extra"><span class="extra-name">Bife Novilho Grelhado</span></div>
+        <div class="extra"><span class="extra-name">Lombo de Bacalhau "Don Tasko"</span></div>
+        <div class="extra"><span class="extra-name">Lombo de Salmão Selado</span></div>
+    </div>
+</section>
+
+<!-- SOBRE NÓS -->
+<section class="about">
+    <div class="about-img"><img src="img1.png" alt="Interior Restaurante Don Tasko"></div>
+    <div class="about-text">
+        <span class="about-tag">O Don Tasko</span>
+        <div class="about-divider"></div>
+        <h2>Novilho<br>Sem Atalhos</h2>
+        <blockquote>Um bom corte não precisa de disfarce. Precisa de respeito.</blockquote>
+        <p>Especializámo-nos em cortes de novilho, cada um trabalhado com a técnica certa para o que é. Sem atalhos: matéria-prima selecionada, preparação cuidada e uma sala que convida a voltar.</p>
+        <a href="https://www.google.com/maps/dir/?api=1&destination=Restaurante+Don+Tasko+Castelo+Branco&destination_place_id=0xd3d5f83bf5aba8b:0x2b3c6b258c2d02c8"
+           target="_blank" rel="noopener" class="btn-red">📍 Como Chegar</a>
+    </div>
+</section>
+
+<!-- INFO BLOCKS -->
+<div class="infos">
+    <div class="info-block">
+        <div class="info-icon">📍</div>
+        <h3>Localização</h3>
+        <p>Avenida de Espanha, Lote 7, R/C Esq.<br>Castelo Branco</p>
+        <a href="https://www.google.com/maps/dir/?api=1&destination=Restaurante+Don+Tasko+Castelo+Branco&destination_place_id=0xd3d5f83bf5aba8b:0x2b3c6b258c2d02c8"
+           target="_blank" rel="noopener">Como Chegar →</a>
+    </div>
+    <div class="info-block">
+        <div class="info-icon">⭐</div>
+        <h3>Avaliações</h3>
+        <p>4.8 estrelas no Google.<br>Veja o que os nossos clientes dizem.</p>
+        <a href="https://www.google.com/maps/place/Restaurante+Don+Tasko/@39.828886,-7.4826148,17z"
+           target="_blank" rel="noopener">Avaliar no Google →</a>
+    </div>
+    <div class="info-block">
+        <div class="info-icon">🗓</div>
+        <h3>Reservas</h3>
+        <p>Reserve a sua mesa online. Confirmação imediata, sem telefonemas.</p>
+        <a href="reservas.html">Reservar Mesa →</a>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+    <div class="footer-top">
+        <div>
+            <div class="foot-logo">Don Tasko<span class="dot">.</span></div>
+        </div>
+        <div class="footer-empresa">
+            <strong>Maria Helena V. Fernandes Afonso, Lda</strong>
+            NIF: 516 763 482<br>
+            Avenida de Espanha, Lote 7, R/C Esq. · Castelo Branco<br>
+            <a href="tel:+351925504212">📞 +351 925 504 212</a>
+            <span style="font-size:.68rem;opacity:.5;display:block">Chamada para rede móvel nacional</span>
+            <a href="mailto:dontasko.geral@gmail.com" style="font-size:.8rem">✉️ dontasko.geral@gmail.com</a>
+        </div>
+        <div class="footer-nav">
+            <a href="#" onclick="abrirPrivacidade(event)">Política de Privacidade</a>
+            <a href="#" onclick="abrirCookies(event)">Política de Cookies</a>
+            <a href="#" onclick="abrirTermos(event)">Termos e Condições</a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <div class="footer-copy">
+            © 2024 Don Tasko · Maria Helena V. Fernandes Afonso, Lda · NIF 516 763 482
+        </div>
+        <a href="https://www.livroreclamacoes.pt" target="_blank" rel="noopener noreferrer" class="livro-rec">
+            <svg width="40" height="30" viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg">
+                <rect width="80" height="60" rx="6" fill="#c0392b"/>
+                <rect x="6" y="8" width="68" height="44" rx="4" fill="#e74c3c"/>
+                <rect x="12" y="14" width="56" height="32" rx="2" fill="white"/>
+                <text x="40" y="28" font-family="Arial" font-size="7" font-weight="bold" fill="#c0392b" text-anchor="middle">LIVRO DE</text>
+                <text x="40" y="37" font-family="Arial" font-size="7" font-weight="bold" fill="#c0392b" text-anchor="middle">RECLAMAÇÕES</text>
+                <text x="40" y="44" font-family="Arial" font-size="5" fill="#888" text-anchor="middle">ELECTRÓNICO</text>
+            </svg>
+            <div class="livro-rec-text">
+                <strong>Livro de Reclamações</strong>
+                Reclamações electrónicas em livroreclamacoes.pt
+            </div>
+        </a>
+    </div>
+</footer>
+
+<!-- MODAL PRIVACIDADE -->
+<div class="modal-priv" id="modalPrivacidade" onclick="fecharModal('modalPrivacidade', event)">
+    <div class="modal-priv-box">
+        <h3>Política de Privacidade</h3>
+        <h4>Responsável pelo Tratamento</h4>
+        <p>Maria Helena V. Fernandes Afonso, Lda · NIF 516 763 482 · Avenida de Espanha, Lote 7, R/C Esq., Castelo Branco · dontasko.geral@gmail.com</p>
+        <h4>Dados Recolhidos</h4>
+        <p>Para efeitos de gestão de reservas recolhemos: nome completo, endereço de email e número de telemóvel.</p>
+        <h4>Finalidade e Base Legal</h4>
+        <p>Os dados são tratados exclusivamente para gestão da reserva (execução de contrato — Art. 6.º, n.º 1, al. b) do RGPD) e envio de confirmação por email.</p>
+        <h4>Conservação</h4>
+        <p>Os dados são conservados durante 12 meses após a data da reserva, findo o qual são eliminados.</p>
+        <h4>Partilha com Terceiros</h4>
+        <p>Os seus dados não são partilhados com terceiros para fins comerciais. São utilizados os serviços Google (Gmail, Google Sheets, Google Calendar) para processamento operacional, sujeitos à política de privacidade da Google.</p>
+        <h4>Direitos do Titular</h4>
+        <p>Tem direito de acesso, rectificação, apagamento, portabilidade e oposição ao tratamento. Contacte: dontasko.geral@gmail.com</p>
+        <h4>Autoridade de Controlo</h4>
+        <p>Tem o direito de apresentar reclamação à CNPD — www.cnpd.pt</p>
+        <button class="modal-priv-close" onclick="document.getElementById('modalPrivacidade').classList.remove('show')">Fechar</button>
+    </div>
+</div>
+
+<!-- MODAL COOKIES -->
+<div class="modal-priv" id="modalCookies" onclick="fecharModal('modalCookies', event)">
+    <div class="modal-priv-box">
+        <h3>Política de Cookies</h3>
+        <h4>O que são cookies?</h4>
+        <p>Cookies são pequenos ficheiros guardados no seu dispositivo que permitem melhorar a experiência de navegação.</p>
+        <h4>Cookies utilizados</h4>
+        <ul>
+            <li><strong>Cookies essenciais</strong> — necessários para o funcionamento do site. Não requerem consentimento.</li>
+            <li><strong>Cookies de terceiros</strong> — Google Fonts carrega tipografia externamente e pode guardar cookies de sessão anónimos.</li>
+            <li><strong>Cookie de consentimento</strong> — guardamos localmente a sua preferência (não é enviado para servidores).</li>
+        </ul>
+        <h4>Não utilizamos</h4>
+        <p>Não utilizamos cookies de rastreamento, publicidade ou analítica de terceiros.</p>
+        <h4>Gerir preferências</h4>
+        <p>Pode gerir cookies nas definições do seu browser. Saiba mais em aboutcookies.org.</p>
+        <button class="modal-priv-close" onclick="document.getElementById('modalCookies').classList.remove('show')">Fechar</button>
+    </div>
+</div>
+
+<!-- MODAL TERMOS -->
+<div class="modal-priv" id="modalTermos" onclick="fecharModal('modalTermos', event)">
+    <div class="modal-priv-box">
+        <h3>Termos e Condições</h3>
+        <h4>Reservas</h4>
+        <ul>
+            <li>As reservas são válidas com tolerância de atraso de <strong>10 minutos</strong>.</li>
+            <li>Cancelamentos devem ser comunicados com antecedência mínima de 24 horas pelo telefone 925 504 212 (chamada para rede móvel nacional).</li>
+            <li>A reserva não garante mesa específica, salvo acordo prévio.</li>
+        </ul>
+        <h4>Bolo de Aniversário Exterior</h4>
+        <p>A utilização de bolo trazido do exterior implica um custo de serviço referente a loiça, guardanapos e apoio prestado, <strong>quando não há consumo de sobremesas da casa ou a sobremesa é só o bolo.</strong></p>
+        <h4>Preços e Informação</h4>
+        <p>Os preços praticados são os constantes do menu disponível no estabelecimento e incluem IVA à taxa legal em vigor. Informação nutricional e alergénios disponível a pedido.</p>
+        <h4>Reclamações</h4>
+        <p>O estabelecimento dispõe de Livro de Reclamações electrónico disponível em livroreclamacoes.pt, conforme Decreto-Lei n.º 156/2005.</p>
+        <h4>Lei Aplicável</h4>
+        <p>Os presentes termos são regidos pela legislação portuguesa em vigor.</p>
+        <button class="modal-priv-close" onclick="document.getElementById('modalTermos').classList.remove('show')">Fechar</button>
+    </div>
+</div>
+
+<!-- COOKIE BANNER -->
+<div class="cookie-banner" id="cookieBanner">
+    <div class="cookie-inner">
+        <div class="cookie-text">
+            Este site utiliza cookies essenciais e cookies de terceiros para carregamento de fontes (Google Fonts).
+            Consulte a nossa <a href="#" onclick="abrirCookies(event)">Política de Cookies</a> e
+            <a href="#" onclick="abrirPrivacidade(event)">Política de Privacidade</a>.
+        </div>
+        <div class="cookie-btns">
+            <button class="cookie-btn aceitar" onclick="aceitarCookies()">Aceitar</button>
+            <button class="cookie-btn recusar" onclick="recusarCookies()">Só essenciais</button>
+        </div>
+    </div>
+</div>
+
+<script src="cookie-banner.js"></script>
+<script>
+// ── COOKIES ──
+function verificarConsentimento() {
+    if (!localStorage.getItem('dt_cookie_consent'))
+        document.getElementById('cookieBanner').classList.add('show');
+}
+function aceitarCookies() {
+    localStorage.setItem('dt_cookie_consent', 'accepted');
+    document.getElementById('cookieBanner').classList.remove('show');
+}
+function recusarCookies() {
+    localStorage.setItem('dt_cookie_consent', 'essential');
+    document.getElementById('cookieBanner').classList.remove('show');
+}
+
+// ── MODAIS ──
+function abrirPrivacidade(e) { e.preventDefault(); document.getElementById('modalPrivacidade').classList.add('show'); }
+function abrirCookies(e)     { e.preventDefault(); document.getElementById('modalCookies').classList.add('show'); }
+function abrirTermos(e)      { e.preventDefault(); document.getElementById('modalTermos').classList.add('show'); }
+function fecharModal(id, e) {
+    if (e.target === document.getElementById(id))
+        document.getElementById(id).classList.remove('show');
+}
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', verificarConsentimento);
+</script>
 </body>
 </html>
